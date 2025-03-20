@@ -1,0 +1,48 @@
+#683D2DFEC516
+#FEC516 yellow
+ #FE025B red
+ #19468A blue
+
+
+
+    if (isset($_SESSION['cart'])) {
+        $count = count($_SESSION['cart']);
+        $_SESSION['cart'][$count] = array('Service' => $_POST['Service'], 'price' => $_POST['price'], 'Quantity' => 1);
+        // print_r($_SESSION['cart']);
+        echo "
+        <script>
+        alert('Service already added');
+        window.location.href='index.php';
+        </script>
+        ";
+    } else {
+        $_SESSION['cart'][0] = array('Service' => $_POST['Service'], 'price' => $_POST['price'], 'Quantity' => 1);
+        // print_r($_SESSION['cart']);
+        echo "
+        <script>
+        alert('Service added');
+        window.location.href='index.php';
+        </script>
+        ";
+    }
+
+        $order_id = mysqli_insert_id($conn);
+            $query2 = "INSERT INTO `user_orders`(`order_id`, `service_name`, `price`) VALUES ('?','?','?')";
+            $stmt = mysqli_prepare($conn, $query2);
+            if ($stmt) {
+                mysqli_stmt_bind_param($stmt, "isi", $order_id, $service_name, $price);
+                foreach ($_SESSION['cart'] as $key => $values) {
+                    $service_name = $values['Service'];
+                    $price = $values['price'];
+                    mysqli_stmt_execute($stmt);
+                }
+                unset($_SESSION['cart']);
+                echo "
+        <script>
+        alert('order placed');
+        window.location.href='index.php';
+        </script>
+        ";
+            } else {
+                echo "prepare not connect";
+            }
